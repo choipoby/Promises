@@ -11,8 +11,9 @@
     "url": "git+https://github.com/choipoby/Promises.git"
   },
   "dependencies": {
-    "xmlhttprequest": "latest"
-  }
+    "promise": "^7.1.1",
+    "xmlhttprequest": "^1.8.0"
+  },
   "author": "sekwon choi",
   "license": "ISC",
   "bugs": {
