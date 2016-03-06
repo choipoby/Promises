@@ -12,20 +12,24 @@ function quotePrice()
       + "NFLX"
       + "/quote?format=json&view=detail";
 
-    var request = new XMLHttpRequest();
-    request.open("GET", requestURL, false);
-    request.onreadystatechange = function(){
-      if (request.readyState==4 && request.status==200) {
-        var responseAsString = request.responseText;
-        var responseAsArray = JSON.parse(responseAsString);
-        var responseAsObject = responseAsArray.list.resources[0].resource;
-        var priceLast = parseFloat(responseAsObject.fields.price);
-        resolve(priceLast);
-      } else {
-        reject("could not get data");
+    try{
+      var request = new XMLHttpRequest();
+      request.open("GET", requestURL, false);
+      request.onreadystatechange = function(){
+        if (request.readyState==4 && request.status==200) {
+          var responseAsString = request.responseText;
+          var responseAsArray = JSON.parse(responseAsString);
+          var responseAsObject = responseAsArray.list.resources[0].resource;
+          var priceLast = parseFloat(responseAsObject.fields.price);
+          resolve(priceLast);
+        } else {
+          reject("could not get data");
+        }
       }
+      request.send();
+    } catch(err) {
+      reject(err);
     }
-    request.send();
   });
 }
 
@@ -41,7 +45,7 @@ function showError(error)
 
 function example1()
 {
-  return quotePrice().then(function(price){showPrice(price);}).catch(function(err){showError(err);});
+  return quotePrice().then(function(price){showPrice(price);});
 }
 
 /*
@@ -58,22 +62,26 @@ function quoteStocksParallel()
   //stockQuoteUrls.forEach(function(url){console.log(url);});
   var requests = stockQuoteUrls.map(function(url){
     return new Promise(function(resolve, reject){
-      var request = new XMLHttpRequest();
-      //console.log("requesting " + url);
-      request.open("GET", url, false);
-      request.onreadystatechange = function(){
-        if (request.readyState==4 && request.status==200) {
-          var responseAsString = request.responseText;
-          var responseAsArray = JSON.parse(responseAsString);
-          var responseAsObject = responseAsArray.list.resources[0].resource;
-          var priceLast = parseFloat(responseAsObject.fields.price);
-          //console.log(priceLast);
-          resolve(priceLast);
-        } else {
-          reject("could not get data");
+      try{
+        var request = new XMLHttpRequest();
+        //console.log("requesting " + url);
+        request.open("GET", url, false);
+        request.onreadystatechange = function(){
+          if (request.readyState==4 && request.status==200) {
+            var responseAsString = request.responseText;
+            var responseAsArray = JSON.parse(responseAsString);
+            var responseAsObject = responseAsArray.list.resources[0].resource;
+            var priceLast = parseFloat(responseAsObject.fields.price);
+            //console.log(priceLast);
+            resolve(priceLast);
+          } else {
+            reject("could not get data");
+          }
         }
+        request.send();
+      }catch(err){
+        reject(err);
       }
-      request.send();
     });
   });
 
@@ -99,22 +107,26 @@ function quoteStocksParallel2()
     function getInfo(url){
       //console.log(url);
       return new Promise(function(resolve, reject){
-        var request = new XMLHttpRequest();
-        //console.log("requesting " + url);
-        request.open("GET", url, false);
-        request.onreadystatechange = function(){
-          if (request.readyState==4 && request.status==200) {
-            var responseAsString = request.responseText;
-            var responseAsArray = JSON.parse(responseAsString);
-            var responseAsObject = responseAsArray.list.resources[0].resource;
-            var priceLast = parseFloat(responseAsObject.fields.price);
-            //console.log(priceLast);
-            resolve(priceLast);
-          } else {
-            reject("could not get data");
+        try{
+          var request = new XMLHttpRequest();
+          //console.log("requesting " + url);
+          request.open("GET", url, false);
+          request.onreadystatechange = function(){
+            if (request.readyState==4 && request.status==200) {
+              var responseAsString = request.responseText;
+              var responseAsArray = JSON.parse(responseAsString);
+              var responseAsObject = responseAsArray.list.resources[0].resource;
+              var priceLast = parseFloat(responseAsObject.fields.price);
+              //console.log(priceLast);
+              resolve(priceLast);
+            } else {
+              reject("could not get data");
+            }
           }
+          request.send();
+        }catch(err){
+          reject(err);
         }
-        request.send();
       });
     }
 }
@@ -134,7 +146,7 @@ function log(string)
 
 Promise.resolve("Start Application")
 .then(function(string){console.log(string);})
-.then(function(){log("Example 1"); example1();})
-.then(function(){log("Example 2"); example2();})
-.then(function(){log("Example 3"); example3();})
-.catch(function(string){log("error " + string);})
+.then(function(){log("Example 1"); return example1();})
+.then(function(){log("Example 2"); return example2();})
+.then(function(){log("Example 3"); return example3();})
+.catch(function(string){log("Error handler : error " + string);})
